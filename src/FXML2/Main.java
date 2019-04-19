@@ -6,7 +6,12 @@
 package FXML2;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.Scanner;
 import javafx.application.Application;
 import javafx.fxml.FXML;
@@ -27,17 +32,22 @@ public class Main extends Application {
 
     @FXML
     private TextArea area;
+    boolean able = false;
+
+    File file;
 
     @FXML
     private void Open() {
         area.setEditable(true);
+        able = true;
         System.out.println("Open");
         try {
             FileChooser chooser = new FileChooser();
             FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
             chooser.getExtensionFilters().add(extFilter);
-            File file = chooser.showOpenDialog(null);
+            file = chooser.showOpenDialog(null);
             Scanner s = new Scanner(file);
+            area.setText("");
             while (s.hasNext()) {
                 area.appendText(s.next() + "\n");
             }
@@ -48,7 +58,22 @@ public class Main extends Application {
     }
 
     @FXML
+    private void Save() throws FileNotFoundException, IOException {
+        if (able) {
+            FileOutputStream fos = new FileOutputStream(file);
+            OutputStreamWriter osw = new OutputStreamWriter(fos);
+            PrintWriter pw = new PrintWriter(osw);
+            pw.println(area.getText());
+            pw.flush();
+            fos.close();
+            osw.close();
+            pw.close();
+        }
+    }
+
+    @FXML
     private void Close() {
+        able = false;
         System.out.println("Close");
         area.setText("Default Text...");
         area.setEditable(false);
